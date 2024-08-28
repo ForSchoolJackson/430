@@ -21,7 +21,7 @@ function loadJsonXHR(url, callback) {
   xhr.onload = () => {
     if (xhr.status == "404") {
       console.log(`NOT FOUND:${url}`);
-      callback([{ content: `NOT FOUND:${url}` }])
+      callback([{ author:"", content: `NOT FOUND:${url}` }])
       return;
     }
 
@@ -30,12 +30,12 @@ function loadJsonXHR(url, callback) {
 
     try {
       json = JSON.parse(text);
-    } 
+    }
     catch (err) {
       console.log(`ERR: ${err}`)
-      json = [{content: `Dont take any wooden nickles!`}]
+      json = [{ author: "Billy Joe", content: `Dont take any wooden nickles!` }]
     }
-    finally{
+    finally {
       callback(json);
     }
 
@@ -47,12 +47,17 @@ function loadJsonXHR(url, callback) {
 
 }
 
-const jsonUrl = "data/quotes-data.json";
+const jsonUrl = "data/quotes-data.json"
 const btnRandom = document.querySelector("#btn-random");
-const resultsDiv = document.querySelector("#results");
+//const resultsDiv = document.querySelector("#content p");
+const authorDiv =  document.querySelector(".my-4 h2");
+const quoteDiv = document.querySelector(".my-4 p")
 
 const quoteComponent = json => {
-  resultsDiv.innerHTML = randomElement(json).content;
+  const quoteRand = randomElement(json);
+  //resultsDiv.innerHTML = (`${quoteRand.author} <p><i>"${quoteRand.content}"</i></p> `);
+  authorDiv.innerHTML = (`${quoteRand.author}`);
+  quoteDiv.innerHTML = (`<i>"${quoteRand.content}"</i>`);
 }
 
 btnRandom.onclick = () => loadJsonXHR(jsonUrl, quoteComponent);
