@@ -14,7 +14,9 @@ const randomElement = array => {
 // ... get a reference to "results" <div>
 // ... and so on
 
-
+const jsonUrl = "https://people.rit.edu/~acjvks/fall-2024/services/quote/quote-random-json-or-text.php"
+const btnRandom = document.querySelector("#btn-random");
+const resultsDiv = document.querySelector("#content p");
 
 function loadJsonXHR(url, callback) {
 
@@ -23,7 +25,7 @@ function loadJsonXHR(url, callback) {
   xhr.onload = () => {
     if (xhr.status == "404") {
       console.log(`NOT FOUND:${url}`);
-      callback([{ author:"", content: `NOT FOUND:${url}` }])
+      callback([{ author: "", content: `NOT FOUND:${url}` }])
       return;
     }
 
@@ -49,11 +51,12 @@ function loadJsonXHR(url, callback) {
 
 }
 
-const jsonUrl = "https://people.rit.edu/~acjvks/fall-2024/services/quote/quote-random-json-or-text.php"
-const btnRandom = document.querySelector("#btn-random");
-const resultsDiv = document.querySelector("#content p");
+const getJsonFetch = async (url, callback) => {
+  let json;
 
-const quoteComponent = ({author, content}) => {
+}
+
+const quoteComponent = ({ author, content }) => {
   resultsDiv.innerHTML = ` <a class="relative bg-gray-900 block p-6 border border-gray-100 rounded-lg max-w-sm mx-auto mt-24" href="#">
       
       <span class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
