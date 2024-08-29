@@ -14,6 +14,8 @@ const randomElement = array => {
 // ... get a reference to "results" <div>
 // ... and so on
 
+
+
 function loadJsonXHR(url, callback) {
 
   const xhr = new XMLHttpRequest();
@@ -40,26 +42,25 @@ function loadJsonXHR(url, callback) {
     }
 
 
-
   }
   xhr.open("GET", url);
+  xhr.setRequestHeader("accept", "application/json");
   xhr.send();
 
 }
 
-const jsonUrl = "data/quotes-data.json"
+const jsonUrl = "https://people.rit.edu/~acjvks/fall-2024/services/quote/quote-random-json-or-text.php"
 const btnRandom = document.querySelector("#btn-random");
 const resultsDiv = document.querySelector("#content p");
 
-const quoteComponent = json => {
-  const quoteRand = randomElement(json);
+const quoteComponent = ({author, content}) => {
   resultsDiv.innerHTML = ` <a class="relative bg-gray-900 block p-6 border border-gray-100 rounded-lg max-w-sm mx-auto mt-24" href="#">
       
       <span class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
 
       <div class="my-4">
-          <h2 class="text-white text-2xl font-bold pb-2">${quoteRand.author}</h2>
-          <p class="text-gray-300 py-1"><i>"${quoteRand.content}"</i></p>
+          <h2 class="text-white text-2xl font-bold pb-2">${author}</h2>
+          <p class="text-gray-300 py-1"><i>"${content}"</i></p>
       </div>
 
       <div class="flex justify-end">
