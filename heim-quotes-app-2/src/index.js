@@ -53,7 +53,6 @@ const resultsDiv = document.querySelector("#content p");
 
 const quoteComponent = json => {
   const quoteRand = randomElement(json);
-  //resultsDiv.innerHTML = (`${quoteRand.author} <p><i>"${quoteRand.content}"</i></p> `);
   resultsDiv.innerHTML = ` <a class="relative bg-gray-900 block p-6 border border-gray-100 rounded-lg max-w-sm mx-auto mt-24" href="#">
       
       <span class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
