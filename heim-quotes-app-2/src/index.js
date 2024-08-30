@@ -14,7 +14,7 @@ const randomElement = array => {
 // ... get a reference to "results" <div>
 // ... and so on
 
-const jsonUrl = "https://people.rit.edu/~acjvks/fall-2024/services/quote/quote-random-json-or-text.php"
+const jsonUrl = "https://people.rit.edu/jmh4687/430/quotes-app-2/data/quote-random-json-or-text.php"
 const btnRandom = document.querySelector("#btn-random");
 const resultsDiv = document.querySelector("#content p");
 
@@ -53,6 +53,20 @@ function loadJsonXHR(url, callback) {
 
 const getJsonFetch = async (url, callback) => {
   let json;
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+    json = await response.json();
+  }
+  catch(error){
+    console.log(`ERR: ${err}`)
+    json = [{ author: `Cant parse data file '${url}'` }]
+  }
+  callback(json);
 
 }
 
@@ -72,4 +86,4 @@ const quoteComponent = ({ author, content }) => {
     </a>`
 }
 
-btnRandom.onclick = () => loadJsonXHR(jsonUrl, quoteComponent);
+btnRandom.onclick = () => getJsonFetch(jsonUrl, quoteComponent);
