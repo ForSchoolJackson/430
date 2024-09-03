@@ -14,7 +14,7 @@ const randomElement = array => {
 // ... get a reference to "results" <div>
 // ... and so on
 
-const jsonUrl = "https://people.rit.edu/jmh4687/430/quotes-app-2/data/quote-random-json-or-text.php"
+const jsonUrl = "http://localhost:3000/quotes"
 const btnRandom = document.querySelector("#btn-random");
 const resultsDiv = document.querySelector("#content p");
 
@@ -70,7 +70,7 @@ const getJsonFetch = async (url, callback) => {
 
 }
 
-const quoteComponent = ({ author, content }) => {
+const quoteComponent = ([{ author, content }]) => {
   resultsDiv.innerHTML = ` <a class="relative bg-gray-900 block p-6 border border-gray-100 rounded-lg max-w-sm mx-auto mt-24" href="#">
       
       <span class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
