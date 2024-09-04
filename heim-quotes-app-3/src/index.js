@@ -17,6 +17,8 @@ const randomElement = array => {
 const jsonUrl = "http://localhost:3000/quotes"
 const btnRandom = document.querySelector("#btn-random");
 const resultsDiv = document.querySelector("#content p");
+const btnSearch = document.querySelector("#btn-search");
+const inputTerm = document.querySelector("#input-term");
 
 function loadJsonXHR(url, callback) {
 
@@ -62,13 +64,14 @@ const getJsonFetch = async (url, callback) => {
     });
     json = await response.json();
   }
-  catch(error){
+  catch (error) {
     console.log(`ERR: ${err}`)
     json = [{ author: `Cant parse data file '${url}'` }]
   }
   callback(json);
 
 }
+
 
 const quoteComponent = ([{ author, content }]) => {
   resultsDiv.innerHTML = ` <a class="relative bg-gray-900 block p-6 border border-gray-100 rounded-lg max-w-sm mx-auto mt-24" href="#">
@@ -86,4 +89,41 @@ const quoteComponent = ([{ author, content }]) => {
     </a>`
 }
 
-btnRandom.onclick = () => getJsonFetch(jsonUrl, quoteComponent);
+btnRandom.onclick = () => {
+  getJsonFetch(jsonUrl, data => {
+    if (data.length > 0) {
+      const randQuote = randomElement(data);
+      const { author, content } = randQuote
+      quoteComponent([{ author, content }])
+    } else {
+      resultsDiv.innerHTML = "ERROR: Quote not found!"
+    }
+
+  });
+}
+
+btnSearch.onclick = (evt) => {
+
+  evt.preventDefault(); // disable defualt sumbit
+
+  // now grab the `.value` of #input-term
+  const index = inputTerm.value.trim();
+  if (index === "" || isNaN(index)) {
+    resultsDiv.innerHTML = "ERROR: Not a valid index!"
+  } else {
+    // now build the URL to fetch that specific quote
+    const url = `${jsonUrl}?index=${index}`;
+    // now call `getJsonFetch()`
+    getJsonFetch(url, data => {
+      if (data.length > 0) {
+        quoteComponent(data);
+      } else {
+        resultsDiv.innerHTML = "ERROR: Quote not found!"
+      }
+    })
+
+  }
+
+
+}
+
