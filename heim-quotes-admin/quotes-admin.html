@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotes Admin</title>
+</head>
+
+<body>
+    <h1>Quotes Admin</h1>
+    <h2>Add a Quote (POST)</h2>
+    <!-- AI prompt - "I need an HTML form with content, author and id fields" -->
+    <!-- Nice Reference: https://www.w3schools.com/html/html_forms.asp -->
+    <form id="form-new-quote" action="http://localhost:3000/quotes" method="POST">
+        <label for="content">Quote:</label><br>
+        <textarea id="content" name="content" rows="4" required></textarea><br><br>
+
+        <label for="author">Author:</label><br>
+        <input type="text" id="author" name="author" required><br><br>
+
+        <label for="id">ID:</label><br>
+        <input id="id" name="id" required size="38" readonly><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <hr>
+
+    <h2>POST Results</h2>
+    <div id="post-results">
+        <p></p>
+        <pre></pre>
+    </div>
+
+    <hr>
+    <hr>
+
+    <h2>Delete Quote</h2>
+    <button id="btn-delete">Delete</button> | <input id="delete-id" size="38">
+
+    <h3>DELETE Results</h3>
+    <div id="delete-results">
+        <p></p>
+        <pre></pre>
+    </div>
+
+    <hr>
+    <hr>
+
+    <h2>View All Quotes</h2>
+    <div id="all-quotes"></div>
+    <script>
+        // Code goes here!
+        const newQuoteForm = document.querySelector("#form-new-quote");
+
+        //HELPERS
+        const generateNewId = () => crypto.randomUUID();
+
+        const postNewQuote = async (url, payload, callback) => {
+            let json;
+            let status;
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "accept": "application/json",
+                        "content-type": "application/json"
+                    },
+                    body: JSON.stringify(payload),
+
+                });
+
+                json = await response.json();
+                status = `status: ${response.status} : ${response.statusText}`;
+            }
+            catch (error) {
+                console.log("ERROR:", error);
+                json = { author: `Cant parse data file '${url}'` };
+            }
+            finally {
+                callback(json, status);
+            }
+            showAllQuotes();
+        };
+
+        const showAllQuotes = () => {
+            getJsonFetch(allQuotesEndpoint, allQuotesCallback);
+            console.log("showing");
+        }
+
+        const postCallback = (json, status) => {
+            console.log("json", json);
+            console.log("status", status);
+            document.querySelector("#post-results p").innerHTML = status;
+            document.querySelector("#post-results pre").innerHTML = JSON.stringify(json);
+            showAllQuotes();
+        };
+
+        //FETCH JSON
+        const getJsonFetch = async (url, callback) => {
+            let json;
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+                json = await response.json();
+            }
+            catch (error) {
+                console.log(`ERR: ${err}`)
+                json = [{ author: `Cant parse data file '${url}'` }]
+            }
+            callback(json);
+
+        }
+
+
+        //EVENTS
+        newQuoteForm.onsubmit = evt => {
+            evt.preventDefault();
+            const url = newQuoteForm.action;
+            const content = newQuoteForm["content"].value;
+            const author = newQuoteForm["author"].value;
+            const id = newQuoteForm["id"].value;
+            const payload = {
+                author,
+                content,
+                id,
+                createdAt: new Date().toISOString(),
+                updateAt: new Date().toISOString()
+            }
+            postNewQuote(url, payload, postCallback);
+
+            //reset form fields
+            newQuoteForm["content"].value = "";
+            newQuoteForm["author"].value = "";
+            newQuoteForm["id"].value = generateNewId();
+            showAllQuotes();
+
+        };
+
+        //INIT - runs once
+        newQuoteForm["id"].value = generateNewId();
+    </script>
+</body>
+
+</html>
