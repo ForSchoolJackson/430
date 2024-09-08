@@ -37,7 +37,7 @@
     <hr>
 
     <h2>Delete Quote</h2>
-    <button id="btn-delete">Delete</button> | <input id="delete-id" size="38">
+    <button id="btn-delete" type="button">Delete</button> | <input id="delete-id" size="38">
 
     <h3>DELETE Results</h3>
     <div id="delete-results">
@@ -53,6 +53,8 @@
     <script>
         // Code goes here!
         const newQuoteForm = document.querySelector("#form-new-quote");
+        const allQuotesEndpoint = "http://localhost:3000/quotes"
+        const deleteButton = document.querySelector("#btn-delete");
 
         //HELPERS
         const generateNewId = () => crypto.randomUUID();
@@ -81,12 +83,67 @@
             finally {
                 callback(json, status);
             }
-            showAllQuotes();
+
+        };
+
+        const deleteQuote = async (url, quoteId, callback) => {
+            let json;
+            let status;
+            try {
+
+                if (!quoteId) {
+                    throw new Error("Invalid ID");
+                    response.status = "404"
+                }
+
+                const deleteUrl = `${url}/${quoteId}`;
+                const response = await fetch(deleteUrl, {
+                    method: "DELETE",
+                    headers: {
+                        "accept": "application/json",
+                        "content-type": "application/json"
+                    }
+                });
+
+                json = await response.json();
+                status = `status: ${response.status} : ${response.statusText}`;
+            }
+            catch (error) {
+                console.log("ERROR:", error);
+                status = `status: 404 : Not Found`;
+                json = { error: `${error.message}` };
+            }
+            finally {
+                callback(json, status);
+            }
+
         };
 
         const showAllQuotes = () => {
             getJsonFetch(allQuotesEndpoint, allQuotesCallback);
-            console.log("showing");
+        }
+
+        const quoteComponent = ([{ id, content, author }]) => {
+            const currentQuote = `<p><i>"${content}" - ${author} - (${id})</i></p>`
+            document.querySelector("#all-quotes").innerHTML += currentQuote;
+        }
+
+        //CALLBACK
+        const allQuotesCallback = (json) => {
+
+            //clear
+            document.querySelector("#all-quotes").innerHTML = ""
+
+            getJsonFetch(allQuotesEndpoint, data => {
+                if (data.length > 0) {
+                    data.forEach(quote => {
+                        const { id, content, author } = quote;
+                        quoteComponent([{ id, content, author }]);
+                    });
+                } else {
+                    resultsDiv.innerHTML = "ERROR: Quotes not found!"
+                }
+            });
         }
 
         const postCallback = (json, status) => {
@@ -94,7 +151,13 @@
             console.log("status", status);
             document.querySelector("#post-results p").innerHTML = status;
             document.querySelector("#post-results pre").innerHTML = JSON.stringify(json);
-            showAllQuotes();
+        };
+
+        const deleteCallback = (json, status) => {
+            console.log("json", json);
+            console.log("status", status);
+            document.querySelector("#delete-results p").innerHTML = status;
+            document.querySelector("#delete-results pre").innerHTML = JSON.stringify(json);
         };
 
         //FETCH JSON
@@ -110,17 +173,17 @@
                 json = await response.json();
             }
             catch (error) {
-                console.log(`ERR: ${err}`)
+                console.log(`ERR: ${error}`)
                 json = [{ author: `Cant parse data file '${url}'` }]
             }
             callback(json);
-
         }
 
 
         //EVENTS
-        newQuoteForm.onsubmit = evt => {
+        newQuoteForm.addEventListener('submit', evt => {
             evt.preventDefault();
+
             const url = newQuoteForm.action;
             const content = newQuoteForm["content"].value;
             const author = newQuoteForm["author"].value;
@@ -133,17 +196,27 @@
                 updateAt: new Date().toISOString()
             }
             postNewQuote(url, payload, postCallback);
+            showAllQuotes()
 
             //reset form fields
             newQuoteForm["content"].value = "";
             newQuoteForm["author"].value = "";
             newQuoteForm["id"].value = generateNewId();
-            showAllQuotes();
+        });
 
-        };
+        deleteButton.addEventListener('click', evt => {
+            evt.preventDefault();
+
+            let deleteId = document.querySelector("#delete-id").value.trim();
+
+            deleteQuote(allQuotesEndpoint, deleteId, deleteCallback);
+            showAllQuotes()
+
+        });
 
         //INIT - runs once
         newQuoteForm["id"].value = generateNewId();
+        showAllQuotes();
     </script>
 </body>
 
